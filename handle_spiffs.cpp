@@ -78,7 +78,7 @@ void reset_spiffs(){
       si_spiffs.time[i][j] = 0.0;
     }
   }
-  si_spiffs.score = 2410;
+  si_spiffs.score = 0;
 
   save_to_spiffs();
 }
@@ -123,4 +123,26 @@ void update_time_fs(int x, int y, long val){
 
 void increase_count(int x, int y){
   si_spiffs.count[x][y] += 1;
+}
+
+void normalize_data(){
+  if(init_spiffs()){
+    float min_nauc = si_spiffs.naucenost[4][4];
+
+    for(int j = 0; j<10; j++){
+      for(int i = 0; i<10; i++){
+        if(si_spiffs.naucenost[j][i] < min_nauc){
+          min_nauc = si_spiffs.naucenost[j][i];
+        }
+      }
+    }
+
+    for(int j = 0; j<10; j++){
+      for(int i = 0; i<10; i++){
+        si_spiffs.naucenost[j][i] -= min_nauc;
+      }
+    }
+    save_to_spiffs();
+  }
+
 }

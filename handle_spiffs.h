@@ -19,5 +19,7 @@ void read_spiffs();
 void increase_count(int x, int y);
 void add_stat();
 void update_time_fs(int x, int y, long val);
+void normalize_data();
+
 
 #endif

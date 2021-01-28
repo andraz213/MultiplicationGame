@@ -16,6 +16,7 @@ WiFi.forceSleepBegin();   // if you dont need wifi, ~22ma instead of ~75ma
   Serial.begin(115200);
 
   init_spiffs();
+  normalize_data();
   printout_spiffs();
   //reset_spiffs();
 
