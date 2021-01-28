@@ -1,2 +1,4 @@
-# Multiplication_Game
+# Multiplication Game
  
+
+![Vezje za igro](/Circuit_bb.png)
