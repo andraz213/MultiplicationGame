@@ -112,11 +112,13 @@ void printout_spiffs(){
 }
 
 void update_time_fs(int x, int y, long val){
-  if(si_spiffs.time[x][y] < 50.0){
-    si_spiffs.time[x][y] = val;
+  if(val < 30000){
+    if(si_spiffs.time[x][y] < 50.0){
+      si_spiffs.time[x][y] = val;
+    }
+    si_spiffs.time[x][y] *= 0.90;
+    si_spiffs.time[x][y] += ((float) val)*0.10;
   }
-  si_spiffs.time[x][y] *= 0.90;
-  si_spiffs.time[x][y] += ((float) val)*0.10;
 }
 
 void increase_count(int x, int y){
