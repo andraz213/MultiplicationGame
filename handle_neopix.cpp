@@ -43,9 +43,19 @@ void correct_neo(){
 
   delay(100);
 
+}
 
 
-
+void resetting_pix(){
+pixels.clear();
+ for(int i = 0; i<8; i++){
+   if(i % 2 == 0){
+     pixels.setPixelColor(i, pixels.Color(100, 0, 0));
+   }else{
+     pixels.setPixelColor(i, pixels.Color(0, 100, 0));
+   }
+ }
+ pixels.show();
 
 }
 

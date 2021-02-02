@@ -9,7 +9,9 @@
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
-void show_eqq(int x, int y, int ans1, int ans2, int ans3, int ans4);
+void show_eqq_mult(int x, int y, int ans1, int ans2, int ans3, int ans4);
+
+void show_eqq_div(int res_res, int x, int ans1, int ans2, int ans3, int ans4);
 
 void init_screen();
 

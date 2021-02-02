@@ -2,11 +2,13 @@
 #include "handle_screen.h"
 #include "handle_neopix.h"
 #include <Arduino.h>
-//                  1     2     3     4     5     6     7      8     9     10
-bool enabled[10] = {false, true, false, true, true, false, false, false, false, true};
+#include "game_functions.h"
+
+//                  1      2      3      4      5      6      7      8      9      10
+bool enabled[10] = {false, true,  false, true,  true,  false, false, false, false, true};
 
 
-DataList list[100];
+DataList list[200];
 DataList *first;
 
 DataList *next;
@@ -32,10 +34,27 @@ void init_game(){
           list[iter-1].next = &list[iter];
         }
         list[iter].next = 0;
-
+        list[iter].multiplication = true;
         list[iter].x = i;
         list[iter].y = j;
-        list[iter].naucenost = get_naucenost_fs(i, j);
+        list[iter].naucenost = get_naucenost_mult(i, j);
+
+        iter++;
+      }
+    }
+  }
+
+  for(int i = 0; i<10; i++){
+    if(enabled[i]){
+      for(int j = 0; j<10; j++){
+        if(iter > 0){
+          list[iter-1].next = &list[iter];
+        }
+        list[iter].next = 0;
+        list[iter].multiplication = false;
+        list[iter].x = i;
+        list[iter].y = j;
+        list[iter].naucenost = get_naucenost_div(i, j);
 
         iter++;
       }
@@ -98,48 +117,31 @@ void calculate_res(){
   if(pressed != -1){
     long answer_time = millis() - started_move;
     if(pressed == answer){
-      update_time_fs(next->x, next->y, answer_time);
+
       add_stat();
       correct_neo();
-      float points = 1.0;
+
       Serial.println("BRAVO");
-      if(answer_time < 3000){
-        float add =  3.0;
-        add *= 3000.0 - answer_time;
-        add /= 3000.0;
-        add *= 3000.0 - answer_time;
-        add /= 3000.0;
-        points += add;
+      float points = calc_naucenost(answer_time);
 
-      }
-      if(answer_time > 3000){
-        points -= ((float)(answer_time - 3000)) / 20000.0;
-      }
-      if(answer_time > 23000){
-        points = 0.0;
-      }
-      set_naucenost_fs(next->x, next->y, next->naucenost + points);
-      increase_count(next->x, next->y);
-      points *= 0.1;
-      points /= (float)n_enabled;
-      DataList*iter = first;
+      update_time_nauc(points, answer_time);
 
-      while(iter != 0){
-        if(iter != next){
-          set_naucenost_fs(iter->x, iter->y, iter->naucenost - points);
-          Serial.println(iter->naucenost);
-        }
-        iter = (DataList*)iter->next;
-      }
+      update_points(points);
 
-      set_score_fs(get_score_fs() + 1);
+      set_score(get_score() + 1);
+
       save_to_spiffs();
 
       update_list();
       next_move();
     } else {
-      set_naucenost_fs(next->x, next->y, next->naucenost - 0.5);
-      set_score_fs(get_score_fs() - 1);
+
+      if(next->multiplication){
+        set_naucenost_mult(next->x, next->y, next->naucenost - 0.5);
+      }else{
+        set_naucenost_div(next->x, next->y, next->naucenost - 0.5);
+      }
+      set_score(get_score() - 1);
       save_to_spiffs();
 
       update_list();
@@ -157,7 +159,12 @@ void update_list(){
   DataList*iter = first;
 
   while(iter != 0){
-    iter->naucenost = get_naucenost_fs(iter->x, iter->y);
+    if(iter->multiplication){
+      iter->naucenost = get_naucenost_mult(iter->x, iter->y);
+    }else{
+      iter->naucenost = get_naucenost_div(iter->x, iter->y);
+    }
+
     iter = (DataList*)iter->next;
   }
 
@@ -190,59 +197,28 @@ int display_next(){
     }
   }
 
+  Serial.println("hej okej");
+  Serial.println(next->multiplication);
   int x = (next->x + 1);
   int y = (next->y + 1);
-  int ans1 = get_displayed_num(opcije[0]);
-  int ans2 = get_displayed_num(opcije[1]);
-  int ans3 = get_displayed_num(opcije[2]);
-  int ans4 = get_displayed_num(opcije[3]);
+  DataList temp;
+  memcpy(&temp, next, sizeof(DataList));
+  int ans1 = get_displayed_num(opcije[0], temp);
+  int ans2 = get_displayed_num(opcije[1], temp);
+  int ans3 = get_displayed_num(opcije[2], temp);
+  int ans4 = get_displayed_num(opcije[3], temp);
+  if(next->multiplication){
+    show_eqq_mult(x, y, ans1, ans2, ans3, ans4);
+  }else{
+    int res_res = x*y;
+    show_eqq_div(res_res, x, ans1, ans2, ans3, ans4);
+  }
 
-  show_eqq(x, y, ans1, ans2, ans3,ans4);
 
   return res+1;
 }
 
-int get_displayed_num(int mode){
-  int res = 0;
-  switch(mode){
-    case 0:
-      res = (next->x + 1)*(next->y + 1);
-      break;
-    case 1:
-      res = ((next->x + 1)%10 +1)*(next->y + 1);
-      break;
-    case 2:
-      res = (next->x + 1)*((next->y + 1)%10 +1);
-      break;
-    case 3:
-      res = (next->x + 1)*((next->y - 1 + 10)%10 +1);
-      break;
-    case 4:
-      res = ((next->x - 1 + 10)%10 +1) * (next->y + 1);
-      break;
-    case 5:
-      res = (next->x + 1)*(next->y + 1) - 5 + random(10);
-    break;
-    case 6:
-      res = random(100);
-    break;
-    case 7:
-      res = (next->x + 1)*(next->y + 1) - 3 + random(7);
-    break;
-    case 8:
-      res = ((next->x + 1)%10 +1)*(next->y + 1) - 3 + random(7);
-    break;
-    case 9:
-      res = ((next->x - 1 + 10)%10 +1)*(next->y + 1) - 3 + random(7);
-    break;
-  }
 
-
-  if(res == (next->x + 1)*(next->y + 1) && mode != 0 || res < 0 || res > 100){
-    res = random(100);
-  }
-  return res;
-}
 
 
 
@@ -284,4 +260,36 @@ int get_pressed(){
 
 void set_pressed(int p){
   pressed = p;
+}
+
+
+void update_time_nauc(float points, long answer_time){
+  if(next->multiplication){
+    update_time_mult(next->x, next->y, answer_time);
+    set_naucenost_mult(next->x, next->y, next->naucenost + points);
+    increase_count_mult(next->x, next->y);
+  } else {
+    update_time_div(next->x, next->y, answer_time);
+    set_naucenost_div(next->x, next->y, next->naucenost + points);
+    increase_count_div(next->x, next->y);
+  }
+}
+
+void update_points(float points){
+  float points_upd = points;
+  points_upd *= 0.1;
+  points_upd /= (float)(n_enabled * 4);
+  DataList*iter = first;
+
+  while(iter != 0){
+    if(iter != next){
+      if(iter->multiplication){
+        set_naucenost_mult(iter->x, iter->y, iter->naucenost - points_upd);
+      }else{
+        set_naucenost_div(iter->x, iter->y, iter->naucenost - points_upd);
+      }
+      Serial.println(iter->naucenost);
+    }
+    iter = (DataList*)iter->next;
+  }
 }
