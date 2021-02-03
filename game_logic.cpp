@@ -5,7 +5,7 @@
 #include "game_functions.h"
 
 //                  1      2      3      4      5      6      7      8      9      10
-bool enabled[10] = {false, true,  false, true,  true,  false, false, false, false, true};
+bool enabled[10] = {false, true,  true,  true,  true,  false, false, false, false, true};
 
 
 DataList list[200];
