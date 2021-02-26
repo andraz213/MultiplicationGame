@@ -123,13 +123,6 @@ void set_naucenost_div(int x, int y, float val){
 
 
 
-
-
-
-
-
-
-
 void printout_spiffs(){
   init_spiffs();
 
@@ -202,4 +195,70 @@ void normalize_data(){
     save_to_spiffs();
   }
 
+}
+
+void printout_stat(){
+
+Serial.println("ŠE NE BEREM HUH");
+if (init_spiffs()) {
+  inited_spiffs = true;
+  File f = SPIFFS.open("/stat.conf", "r");
+  if(f){
+    Serial.println("BEREM PODATKE STAT");
+    int sz = f.size();
+    Serial.println(sz);
+    while(sz){
+
+      Stanjeigre temp;
+
+      uint8_t * temp_p = (uint8_t * ) &temp;
+
+      for(int i = 0; i< sizeof(Stanjeigre); i++){
+        char a = f.read();
+        sz--;
+
+      //Serial.print(a);
+        temp_p[i] = a;
+      //Serial.print(temp_p[i]);
+      //Serial.print(sz);
+      }
+      int score = temp.score;
+      for(int i = 0; i<10; i++){
+        for(int j = 0; j<10; j++){
+          float naucenost = temp.naucenost_mult[i][j];
+          float avg_time = temp.time_mult[i][j];
+          int count = temp.count_mult[i][j];
+          String to_prnt = String(i+1) + "*" + String(j+1)+",";
+          to_prnt += String(naucenost) + ",";
+          to_prnt += String(avg_time) + ",";
+          to_prnt += String(count) + ",";
+          to_prnt += String(score);
+
+          Serial.println(to_prnt);
+        }
+
+
+      }
+
+      for(int i = 0; i<10; i++){
+        for(int j = 0; j<10; j++){
+          float naucenost = temp.naucenost_div[i][j];
+          float avg_time = temp.time_div[i][j];
+          int count = temp.count_div[i][j];
+          String to_prnt = String((i+1)*(j+1)) + ":" + String(i+1)+",";
+          to_prnt += String(naucenost) + ",";
+          to_prnt += String(avg_time) + ",";
+          to_prnt += String(count) + ",";
+          to_prnt += String(score);
+
+          Serial.println(to_prnt);
+        }
+
+
+      }
+
+    }
+    f.close();
+}
+}
 }

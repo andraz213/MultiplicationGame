@@ -24,6 +24,6 @@ void add_stat();
 void update_time_div(int x, int y, long val);
 void update_time_mult(int x, int y, long val);
 void normalize_data();
-
+void printout_stat();
 
 #endif

@@ -19,6 +19,7 @@ void setup() {
 
 
   reset_routine();
+  printout_routine();
 
   normalize_data();
   printout_spiffs();
@@ -28,6 +29,7 @@ void setup() {
 
   init_game();
   next_move();
+
 
 
 }
@@ -44,6 +46,12 @@ void loop() {
 }
 
 
+void printout_routine(){
+pinMode(GUMB_DESNO_ZGORAJ, INPUT_PULLUP);
+    if(digitalRead(GUMB_DESNO_ZGORAJ) == LOW){
+        printout_stat();
+    }
+}
 
 void reset_routine(){
   pinMode(GUMB_LEVO_SPODAJ, INPUT_PULLUP);
@@ -59,8 +67,4 @@ void reset_routine(){
       correct_neo();
     }
   }
-
-
-
-
 }
