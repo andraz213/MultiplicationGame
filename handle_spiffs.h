@@ -10,6 +10,16 @@ void save_to_spiffs();
 void reset_spiffs();
 
 
+typedef struct OneLine {
+  int score;
+  int time;
+  int a;
+  int b;
+  int count;
+};
+
+
+
 int get_score();
 float get_naucenost_div(int x, int y);
 void set_naucenost_div(int x, int y, float val);
@@ -25,5 +35,7 @@ void update_time_div(int x, int y, long val);
 void update_time_mult(int x, int y, long val);
 void normalize_data();
 void printout_stat();
+void add_stat_new(int score, int a, int b, bool is_div, int time);
+void printout_stat_new();
 
 #endif

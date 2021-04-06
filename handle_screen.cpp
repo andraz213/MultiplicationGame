@@ -21,7 +21,7 @@ void show_eqq_div(int res_res, int x, int ans1, int ans2, int ans3, int ans4){
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 0);
 
-  display.println(String(get_score()));
+  display.println(String(3780 + get_score()));
 
   display.setTextSize(2); // Draw 2X-scale text
   display.setTextColor(SSD1306_WHITE);
@@ -81,7 +81,7 @@ void show_eqq_mult(int x, int y, int ans1, int ans2, int ans3, int ans4){
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 0);
 
-  display.println(String(get_score()));
+  display.println(String(3780 + get_score()));
 
 display.setTextSize(2); // Draw 2X-scale text
 display.setTextColor(SSD1306_WHITE);

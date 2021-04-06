@@ -132,6 +132,12 @@ void calculate_res(){
 
       save_to_spiffs();
 
+      if(next->multiplication){
+        add_stat_new(get_score(), (next->x + 1), (next->y + 1), !next->multiplication, (int) answer_time);
+      }else {
+        add_stat_new(get_score(), (next->x + 1), (next->x + 1) * (next->y + 1), !next->multiplication, (int) answer_time);
+      }
+
       update_list();
       next_move();
     } else {

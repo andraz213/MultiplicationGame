@@ -49,7 +49,7 @@ void loop() {
 void printout_routine(){
 pinMode(GUMB_DESNO_ZGORAJ, INPUT_PULLUP);
     if(digitalRead(GUMB_DESNO_ZGORAJ) == LOW){
-        printout_stat();
+        printout_stat_new();
     }
 }
 

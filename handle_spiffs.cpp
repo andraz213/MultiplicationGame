@@ -38,6 +38,41 @@ void add_stat(){
   }
 }
 
+
+void add_stat_new(int score, int a, int b, bool is_div, int time){
+
+    OneLine to_write;
+    to_write.score = score;
+    to_write.time = time;
+    to_write.a = a;
+    to_write.b = b;
+    to_write.count = 0;
+
+    File fileToAppend;
+    if(!is_div){
+      fileToAppend = SPIFFS.open("/stat_mult.conf", "a");
+      to_write.count = si_spiffs.count_mult[a - 1][b - 1];
+    } else {
+      fileToAppend = SPIFFS.open("/stat_div.conf", "a");
+      int y = b / a;
+      y -= 1;
+      int x = a - 1;
+      to_write.count = si_spiffs.count_div[x][y];
+    }
+
+    if(fileToAppend){
+      unsigned char * data = reinterpret_cast<unsigned char*>(&to_write); // use unsigned char, as uint8_t is not guarunteed to be same width as char...
+      size_t bytes = fileToAppend.write((char * )&to_write, sizeof(OneLine)); // C++ way
+
+      Serial.printf("END Position =%u \n", fileToAppend.position());
+      fileToAppend.close();
+    }
+  }
+
+
+
+
+
 void read_spiffs(){
   if (init_spiffs()) {
     inited_spiffs = true;
@@ -259,6 +294,73 @@ if (init_spiffs()) {
 
     }
     f.close();
+}
+}
+}
+
+
+
+
+
+
+
+void printout_stat_new(){
+
+Serial.println("ŠE NE BEREM HUH");
+if (init_spiffs()) {
+  inited_spiffs = true;
+  File f = SPIFFS.open("/stat_mult.conf", "r");
+  if(f){
+    Serial.println("BEREM PODATKE STAT");
+    int sz = f.size();
+    Serial.println(sz);
+    while(sz){
+
+      OneLine temp;
+
+      uint8_t * temp_p = (uint8_t * ) &temp;
+
+      for(int i = 0; i< sizeof(OneLine); i++){
+        char a = f.read();
+        sz--;
+
+      //Serial.print(a);
+        temp_p[i] = a;
+      //Serial.print(temp_p[i]);
+      //Serial.print(sz);
+      }
+
+      String to_prnt = String(temp.a)+","+String(temp.b)+","+String(temp.time)+","+String(temp.score)+","+String(temp.count)+",MULT";
+      Serial.println(to_prnt);
+    }
+    f.close();
+}
+
+f = SPIFFS.open("/stat_div.conf", "r");
+if(f){
+  Serial.println("BEREM PODATKE STAT");
+  int sz = f.size();
+  Serial.println(sz);
+  while(sz){
+
+    OneLine temp;
+
+    uint8_t * temp_p = (uint8_t * ) &temp;
+
+    for(int i = 0; i< sizeof(OneLine); i++){
+      char a = f.read();
+      sz--;
+
+    //Serial.print(a);
+      temp_p[i] = a;
+    //Serial.print(temp_p[i]);
+    //Serial.print(sz);
+    }
+
+    String to_prnt = String(temp.a)+","+String(temp.b)+","+String(temp.time)+","+String(temp.score)+","+String(temp.count)+",DIV";
+    Serial.println(to_prnt);
+  }
+  f.close();
 }
 }
 }
